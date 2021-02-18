@@ -1,0 +1,86 @@
+version: '3.9'
+
+networks:
+  ros:
+    driver: bridge
+
+services:
+  ros-master:
+    image: osrf/ros:noetic-desktop-full
+    command: stdbuf -o L roscore
+    networks:
+      - ros
+    restart: always
+
+  shell:
+    image: docker-ros/base
+    container_name: base-shell
+    networks:
+      - ros
+    environment:
+      - "ROS_MASTER_URI=http://ros-master:11311"
+      - "DISPLAY"
+      - "QT_X11_NO_MITSHM=1"
+    privileged: true
+    volumes: 
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /usr/lib/x86_64-linux-gnu/libXv.so.1:/usr/lib/x86_64-linux-gnu/libXv.so.1
+      - /etc/group:/etc/group:ro
+      - /etc/passwd:/etc/passwd:ro
+      - /etc/shadow:/etc/shadow:ro
+      - /etc/sudoers.d:/etc/sudoers.d:ro
+      - ~/ros-ws:/root/ws:rw
+      - ~/ros-ws/zsh/.zsh_history:/root/.zsh_history:rw
+      - ~/ros-ws/zsh/.zshrc:/root/.zshrc:rw
+      - ~/ros-ws/zsh/.z:/root/.z:rw
+    stdin_open: true
+    tty: true
+    entrypoint: /bin/zsh
+
+
+  vnc:
+    image: docker-ros/vnc
+    container_name: vnc
+    # networks:
+      # - ros
+    environment:
+      - "VNC_PW=rv666"
+      # - "VNC_RESOLUTION=1280x1024"
+    ports:
+      - "5901:5901"
+      - "6901:6901"
+    privileged: true
+    volumes:
+      - /usr/lib/x86_64-linux-gnu/libXv.so.1:/usr/lib/x86_64-linux-gnu/libXv.so.1
+      - /etc/group:/etc/group:ro
+      - /etc/passwd:/etc/passwd:ro
+      - /etc/shadow:/etc/shadow:ro
+      - /etc/sudoers.d:/etc/sudoers.d:ro
+      - ~/ros-ws:/root/ws:rw
+      - ~/ros-ws/zsh/.zsh_history:/root/.zsh_history:rw
+      - ~/ros-ws/zsh/.zshrc:/root/.zshrc:rw
+      - ~/ros-ws/zsh/.z:/root/.z:rw
+
+  autoaim:
+    image: docker-ros/autoaim
+    container_name: autoaim
+    # networks:
+      # - ros
+    environment:
+      # - "ROS_MASTER_URI=http://ros-master:11311"
+      - "VNC_PW=rv666"
+      # - "VNC_RESOLUTION=1280x1024"
+    ports:
+      - "5901:5901"
+      - "6901:6901"
+    privileged: true
+    volumes:
+      - /usr/lib/x86_64-linux-gnu/libXv.so.1:/usr/lib/x86_64-linux-gnu/libXv.so.1
+      - /etc/group:/etc/group:ro
+      - /etc/passwd:/etc/passwd:ro
+      - /etc/shadow:/etc/shadow:ro
+      - /etc/sudoers.d:/etc/sudoers.d:ro
+      - ~/ros-ws:/root/ws:rw
+      - ~/ros-ws/zsh/.zsh_history:/root/.zsh_history:rw
+      - ~/ros-ws/zsh/.zshrc:/root/.zshrc:rw
+      - ~/ros-ws/zsh/.z:/root/.z:rw
