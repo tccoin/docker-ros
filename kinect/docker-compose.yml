@@ -12,26 +12,55 @@ services:
       - ros
     restart: always
 
-    kinect:
-      image: osrf/ros:noetic-desktop-full
-      container_name: ros_visualizer
-      depends_on:
-        - ros-master
-      networks:
-        - ros
-      environment:
-        - "ROS_MASTER_URI=http://ros-master:11311"
-        - "ROS_HOSTNAME=ros_visualizer"
-        - "DISPLAY"
-        - "QT_X11_NO_MITSHM=1" #fix some QT bugs
-      #share your user to the container in order to access your x11
-      user: 1000:1000 #adapt as needed!
-      volumes: 
-        #share your x11 socket and permissions to the container
-        - /tmp/.X11-unix:/tmp/.X11-unix:rw
-        - /etc/group:/etc/group:ro
-        - /etc/passwd:/etc/passwd:ro
-        - /etc/shadow:/etc/shadow:ro
-        - /etc/sudoers.d:/etc/sudoers.d:ro
-        - /home/<your_user>:/home/<your_user>:rw #share your home with write permissions
-      command: roslaunch kinect2_bridge kinect2_bridge.launch
+  kinect:
+    image: docker-ros/kinect
+    container_name: kinect
+    depends_on:
+      - ros-master
+    networks:
+      - ros
+    environment:
+      - "ROS_MASTER_URI=http://ros-master:11311"
+      - "ROS_HOSTNAME=kinect"
+      - "DISPLAY"
+      - "QT_X11_NO_MITSHM=1" #fix some QT bugs
+    #share your user to the container in order to access your x11
+    # user: 1000:1000 #adapt as needed!
+    privileged: true
+    volumes: 
+      #share your x11 socket and permissions to the container
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /usr/lib/x86_64-linux-gnu/libXv.so.1:/usr/lib/x86_64-linux-gnu/libXv.so.1
+      - /etc/group:/etc/group:ro
+      - /etc/passwd:/etc/passwd:ro
+      - /etc/shadow:/etc/shadow:ro
+      - /etc/sudoers.d:/etc/sudoers.d:ro
+      - /home/<your_user>:/home/<your_user>:rw #share your home with write permissions
+    command: /bin/bash -c "source /root/ws/install/local_setup.bash && roslaunch --wait kinect2_bridge kinect2_bridge.launch"
+
+  kinect-shell:
+    image: docker-ros/kinect
+    container_name: kinect-shell
+    networks:
+      - ros
+    environment:
+      - "ROS_MASTER_URI=http://ros-master:11311"
+      - "ROS_HOSTNAME=kinect"
+      - "DISPLAY"
+      - "QT_X11_NO_MITSHM=1" #fix some QT bugs
+    #share your user to the container in order to access your x11
+    # user: 1000:1000 #adapt as needed!
+    privileged: true
+    volumes: 
+      #share your x11 socket and permissions to the container
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /usr/lib/x86_64-linux-gnu/libXv.so.1:/usr/lib/x86_64-linux-gnu/libXv.so.1
+      - /etc/group:/etc/group:ro
+      - /etc/passwd:/etc/passwd:ro
+      - /etc/shadow:/etc/shadow:ro
+      - /etc/sudoers.d:/etc/sudoers.d:ro
+      - /home/<your_user>:/home/<your_user>:rw #share your home with write permissions
+    # command: /bin/bash -c "source /root/ws/install/local_setup.bash"
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    entrypoint: /bin/bash
