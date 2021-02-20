@@ -1,4 +1,6 @@
-# README
+# DOCKER-ROS
+
+[![build status](https://img.shields.io/docker/cloud/build/tccoin/docker-ros)](https://hub.docker.com/repository/docker/tccoin/docker-ros/)
 
 ## Installation
 
