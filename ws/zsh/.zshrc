@@ -66,3 +66,4 @@ unset __conda_setup
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 source ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 source /opt/ros/noetic/setup.zsh
+export PYTHONPATH="/root/ws/autoaim/:$PYTHONPATH"

@@ -59,8 +59,6 @@ services:
 
   camera:
     image: docker-ros/autoaim
-    depends_on:
-      - ros-master
     networks:
       - ros
     environment:
@@ -105,8 +103,6 @@ services:
   debug:
     image: docker-ros/autoaim
     container_name: debug
-    depends_on:
-      - ros-master
     networks:
       - ros
     environment:
