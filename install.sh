@@ -1,6 +1,4 @@
-# git clone https://github.com/ConSol/vnc-container.git vnc/vnc-container
-# cp vnc/.zshrc vnc/vnc-container/src/common/xfce/.zshrc
-# cp vnc/Dockerfile vnc/vnc-container/Dockerfile
-# docker build -t docker-ros/vnc vnc/vnc-container
-
-docker build -t docker-ros/autoaim autoaim/
+docker pull osrf/ros:noetic-desktop-full
+git clone https://github.com/ConSol/vnc-container.git vnc/vnc-container
+touch ws/zsh/.zsh_history
+git clone https://github.com/RoboVigor/RV-AutoAim ws/autoaim

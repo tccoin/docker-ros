@@ -1,5 +1,6 @@
-FROM osrf/ros:noetic-desktop-full
+FROM docker-ros/vnc
 
+ENV HOME=/root
 ENV ROS_DISTRO noetic
 ENV HTTP_PROXY="http://172.17.0.1:10809"
 ENV HTTPS_PROXY="http://172.17.0.1:10809"
@@ -17,6 +18,7 @@ RUN apt-key adv --keyserver "hkp://ha.pool.sks-keyservers.net" --recv-key "0xB01
 RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu `lsb_release -cs` main" > /etc/apt/sources.list.d/ros-latest.list' \ 
     && apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
 
+# install build dependency
 RUN sed -i "/^# deb.*multiverse/ s/^# //" /etc/apt/sources.list \ 
     && apt-get update \ 
     && apt-get install --no-install-recommends -y \
@@ -37,11 +39,29 @@ RUN sed -i "/^# deb.*multiverse/ s/^# //" /etc/apt/sources.list \
 
 WORKDIR /root/build
 
+# install tilix
+RUN sudo apt-get install -y \
+    tilix
+
+# install zsh
 RUN git clone https://github.com/tccoin/easy-linux.git \
     && cd easy-linux \
-    && ./zsh.sh 
+    && ./zsh.sh \
+    && touch /root/.z
 
-RUN sudo apt-get update && sudo apt-get install libqtgui4 -y
+ADD .zshrc /headless
 
+# install gitstatus
+# https://github.com/romkatv/gitstatus/releases/tag/v1.3.1
+RUN mkdir -p /root/.cache/gitstatus \
+    && wget https://github.com/romkatv/gitstatus/releases/download/v1.3.1/gitstatusd-linux-x86_64.tar.gz -O - \
+    | tar -zx -C /root/.cache/gitstatus/
+
+# install conda
+RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh \
+    && bash ~/miniconda.sh -b -p $HOME/miniconda \
+    && rm ~/miniconda.sh
 
 WORKDIR /root/ws
+
+ENTRYPOINT ["/bin/zsh"]

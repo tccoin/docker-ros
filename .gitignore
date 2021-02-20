@@ -2,3 +2,5 @@ ws/*
 !ws/zsh
 ws/zsh/*
 !ws/zsh/.zshrc
+
+vnc/vnc-container

@@ -12,37 +12,11 @@ services:
       - ros
     restart: always
 
-  shell:
-    image: docker-ros/base
-    container_name: base-shell
-    networks:
-      - ros
-    environment:
-      - "ROS_MASTER_URI=http://ros-master:11311"
-      - "DISPLAY"
-      - "QT_X11_NO_MITSHM=1"
-    privileged: true
-    volumes: 
-      - /tmp/.X11-unix:/tmp/.X11-unix:rw
-      - /usr/lib/x86_64-linux-gnu/libXv.so.1:/usr/lib/x86_64-linux-gnu/libXv.so.1
-      - /etc/group:/etc/group:ro
-      - /etc/passwd:/etc/passwd:ro
-      - /etc/shadow:/etc/shadow:ro
-      - /etc/sudoers.d:/etc/sudoers.d:ro
-      - ~/ros-ws:/root/ws:rw
-      - ~/ros-ws/zsh/.zsh_history:/root/.zsh_history:rw
-      - ~/ros-ws/zsh/.zshrc:/root/.zshrc:rw
-      - ~/ros-ws/zsh/.z:/root/.z:rw
-    stdin_open: true
-    tty: true
-    entrypoint: /bin/zsh
-
-
   vnc:
     image: docker-ros/vnc
     container_name: vnc
-    # networks:
-      # - ros
+    networks:
+      - ros
     environment:
       - "VNC_PW=rv666"
       # - "VNC_RESOLUTION=1280x1024"
@@ -56,16 +30,57 @@ services:
       - /etc/passwd:/etc/passwd:ro
       - /etc/shadow:/etc/shadow:ro
       - /etc/sudoers.d:/etc/sudoers.d:ro
-      - ~/ros-ws:/root/ws:rw
-      - ~/ros-ws/zsh/.zsh_history:/root/.zsh_history:rw
-      - ~/ros-ws/zsh/.zshrc:/root/.zshrc:rw
-      - ~/ros-ws/zsh/.z:/root/.z:rw
+      - /ws:/root/ws:rw
+
+  dev_base:
+    image: docker-ros/dev_base
+    container_name: dev_base
+    networks:
+      - ros
+    environment:
+      - "ROS_MASTER_URI=http://ros-master:11311"
+      - "VNC_PW=rv666"
+      # - "VNC_RESOLUTION=1280x1024"
+    ports:
+      - "5901:5901"
+      - "6901:6901"
+    privileged: true
+    volumes: 
+      - /etc/group:/etc/group:ro
+      - /etc/passwd:/etc/passwd:ro
+      - /etc/shadow:/etc/shadow:ro
+      - /etc/sudoers.d:/etc/sudoers.d:ro
+      - ./ws:/root/ws:rw
+      - ./ws/zsh/.zsh_history:/root/.zsh_history:rw
+      - ./ws/zsh/.zshrc:/root/.zshrc:rw
+    stdin_open: true
+    tty: true
+    entrypoint: /bin/zsh
+
+  camera:
+    image: docker-ros/autoaim
+    depends_on:
+      - ros-master
+    networks:
+      - ros
+    environment:
+      - "ROS_MASTER_URI=http://ros-master:11311"
+    privileged: true
+    volumes:
+      - /etc/group:/etc/group:ro
+      - /etc/passwd:/etc/passwd:ro
+      - /etc/shadow:/etc/shadow:ro
+      - /etc/sudoers.d:/etc/sudoers.d:ro
+    stdin_open: true
+    tty: true
+    entrypoint: /bin/bash -c "source ~/catkin_ws/devel/setup.bash && roslaunch galaxy_camera MER-139.launch"
+
 
   autoaim:
     image: docker-ros/autoaim
     container_name: autoaim
-    # networks:
-      # - ros
+    networks:
+      - ros
     environment:
       # - "ROS_MASTER_URI=http://ros-master:11311"
       - "VNC_PW=rv666"
@@ -80,7 +95,37 @@ services:
       - /etc/passwd:/etc/passwd:ro
       - /etc/shadow:/etc/shadow:ro
       - /etc/sudoers.d:/etc/sudoers.d:ro
-      - ~/ros-ws:/root/ws:rw
-      - ~/ros-ws/zsh/.zsh_history:/root/.zsh_history:rw
-      - ~/ros-ws/zsh/.zshrc:/root/.zshrc:rw
-      - ~/ros-ws/zsh/.z:/root/.z:rw
+      - ./ws:/root/ws:rw
+      - ./ws/zsh/.zsh_history:/root/.zsh_history:rw
+      - ./ws/zsh/.zshrc:/root/.zshrc:rw
+    stdin_open: true
+    tty: true
+    entrypoint: /bin/zsh
+
+  debug:
+    image: docker-ros/autoaim
+    container_name: debug
+    depends_on:
+      - ros-master
+    networks:
+      - ros
+    environment:
+      - "ROS_MASTER_URI=http://ros-master:11311"
+      - "VNC_PW=rv666"
+      # - "VNC_RESOLUTION=1280x1024"
+    ports:
+      - "5901:5901"
+      - "6901:6901"
+    privileged: true
+    volumes:
+      - /usr/lib/x86_64-linux-gnu/libXv.so.1:/usr/lib/x86_64-linux-gnu/libXv.so.1
+      - /etc/group:/etc/group:ro
+      - /etc/passwd:/etc/passwd:ro
+      - /etc/shadow:/etc/shadow:ro
+      - /etc/sudoers.d:/etc/sudoers.d:ro
+      - ./ws:/root/ws:rw
+      - ./ws/zsh/.zsh_history:/root/.zsh_history:rw
+      - ./ws/zsh/.zshrc:/root/.zshrc:rw
+    stdin_open: true
+    tty: true
+    entrypoint: /bin/bash -c "(HOME=/headless nohup /dockerstartup/vnc_startup.sh> vnc.log & ) && /bin/zsh"

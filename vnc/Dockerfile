@@ -1,4 +1,4 @@
-FROM docker-ros/base
+FROM osrf/ros:noetic-desktop-full
 
 ENV DISPLAY=:1 \
     VNC_PORT=5901 \
