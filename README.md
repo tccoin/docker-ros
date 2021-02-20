@@ -9,16 +9,24 @@
 https://docs.docker.com/compose/install/
 1. Setup proxy:
 https://docs.docker.com/config/daemon/systemd/
-1. Install and build images:
+1. Setup workspace:
     ```
     bash install.sh
+    ```
+1. Build images:
+    ```
     bash build.sh
     ```
+    Or, you can also pull images from Docker Hub instead of building them:
+    ```
+    bash pull.sh
+    ```
+
 ## Test & Usage
 1. **Test ROS container**:
 
     ```
-    cd test/chatter
+    cd chatter
     docker-compose up
     ```
 
@@ -38,7 +46,7 @@ https://docs.docker.com/config/daemon/systemd/
     docker-compose run --service-ports vnc
     ```
 
-    Then you should be able to visit the desktop at `localhost:6901/vnc.html?password=rv666`.
+    Then you should be able to visit the desktop at `http://localhost:6901/vnc.html?password=rv666`.
 1. **Galaxy camera**:
     To launch Galaxy camera in ROS, run:
     ```
@@ -54,7 +62,7 @@ https://docs.docker.com/config/daemon/systemd/
     docker-compose up
     ```
 
-    Then you should be able to visit the desktop at `localhost:6901/vnc.html?password=rv666`.
+    Then you should be able to visit the desktop at `http://localhost:7901/?rosbridge-websocket-url=ws://localhost:9090`.
 1. **Microsoft Kinect**:
     This image is not built by default. To build it, run:
     ```
