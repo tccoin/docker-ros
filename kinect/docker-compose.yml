@@ -13,7 +13,7 @@ services:
     restart: always
 
   kinect:
-    image: docker-ros/kinect
+    image: tccoin/docker-ros:kinect
     container_name: kinect
     depends_on:
       - ros-master
@@ -39,7 +39,7 @@ services:
     command: /bin/bash -c "source /root/ws/install/local_setup.bash && roslaunch --wait kinect2_bridge kinect2_bridge.launch"
 
   kinect-shell:
-    image: docker-ros/kinect
+    image: tccoin/docker-ros:kinect
     container_name: kinect-shell
     networks:
       - ros

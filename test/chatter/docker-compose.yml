@@ -50,7 +50,6 @@ services:
       - "QT_X11_NO_MITSHM=1" #fix some QT bugs
     user: 1000:1000
     volumes: 
-      #share your x11 socket and permissions to the container
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /etc/group:/etc/group:ro
       - /etc/passwd:/etc/passwd:ro
