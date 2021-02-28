@@ -4,15 +4,15 @@ FROM arm64v8/ros:noetic-perception
 ### PROXY
 ###
 
-ENV HTTP_PROXY="http://192.168.0.187:10809"
-ENV HTTPS_PROXY="http://192.168.0.187:10809"
-ENV http_proxy="http://192.168.0.187:10809"
-ENV https_proxy="http://192.168.0.187:10809"
+# ENV HTTP_PROXY="http://192.168.0.187:10809"
+# ENV HTTPS_PROXY="http://192.168.0.187:10809"
+# ENV http_proxy="http://192.168.0.187:10809"
+# ENV https_proxy="http://192.168.0.187:10809"
 
-RUN sudo touch /etc/apt/apt.conf.d/proxy.conf \ 
-    && sudo echo "Acquire::http::Proxy \"http://192.168.0.187:10809\";" > /etc/apt/apt.conf.d/proxy.conf \ 
-    && sudo echo "Acquire::http::Proxy \"http://192.168.0.187:10809\";" >> /etc/apt/apt.conf.d/proxy.conf \ 
-    && sudo cat /etc/apt/apt.conf.d/proxy.conf
+# RUN sudo touch /etc/apt/apt.conf.d/proxy.conf \ 
+#     && sudo echo "Acquire::http::Proxy \"http://192.168.0.187:10809\";" > /etc/apt/apt.conf.d/proxy.conf \ 
+#     && sudo echo "Acquire::http::Proxy \"http://192.168.0.187:10809\";" >> /etc/apt/apt.conf.d/proxy.conf \ 
+#     && sudo cat /etc/apt/apt.conf.d/proxy.conf
 
 ###
 ### VNC
