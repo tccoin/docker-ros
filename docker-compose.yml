@@ -50,9 +50,9 @@ services:
       - /etc/passwd:/etc/passwd:ro
       - /etc/shadow:/etc/shadow:ro
       - /etc/sudoers.d:/etc/sudoers.d:ro
-      - ./ws:/root/ws:rw
-      - ./ws/zsh/.zshrc:/root/.zshrc:rw
-      - ./ws/zsh/.zsh_history:/root/.zsh_history:rw
+      - ../ws:/root/ws:rw
+      - ../ws/zsh/.zshrc:/root/.zshrc:rw
+      - ../ws/zsh/.zsh_history:/root/.zsh_history:rw
     stdin_open: true
     tty: true
-    entrypoint: /bin/bash -c "(HOME=/headless nohup /dockerstartup/vnc_startup.sh> vnc.log & ) && /bin/zsh"
+    entrypoint: /bin/bash -c "(nohup /dockerstartup/vnc_startup.sh> vnc.log & ) && /bin/zsh"

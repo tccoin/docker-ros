@@ -73,4 +73,4 @@ services:
       - ../ws/zsh/.zsh_history:/root/.zsh_history:rw
     stdin_open: true
     tty: true
-    entrypoint: /bin/bash -c "(HOME=/headless nohup /dockerstartup/vnc_startup.sh> vnc.log & ) && /bin/zsh"
+    entrypoint: /bin/bash -c "(nohup /dockerstartup/vnc_startup.sh> vnc.log & ) && /bin/zsh"
