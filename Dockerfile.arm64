@@ -35,7 +35,7 @@ ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update \
     && apt-get install -y --no-install-recommends software-properties-common \
     curl apache2-utils \
-    apt-utils wget ca-certificates git nano less \
+    apt-utils wget ca-certificates git nano less dconf-cli \
     && apt-get install -y --no-install-recommends --allow-unauthenticated \
     supervisor nginx sudo net-tools zenity xz-utils \
     dbus-x11 x11-utils alsa-utils \
@@ -204,6 +204,8 @@ RUN cd ~/build/Galaxy_Linux_Python_2.0.2008.9111/api/ \
     && /root/miniconda/bin/pip3 install .
 
 RUN apt-get install -y ros-noetic-rqt ros-noetic-rqt-common-plugins
+
+RUN sed 's#!\/usr\/bin\/env #!\/usr\/bin#' /usr/local/lib/web/backend/run.py
 
 HEALTHCHECK --interval=30s --timeout=5s CMD curl --fail http://127.0.0.1:6079/api/health
 ENTRYPOINT ["/bin/zsh"]

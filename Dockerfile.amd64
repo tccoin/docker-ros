@@ -27,11 +27,12 @@ RUN sed -i 's#http://archive.ubuntu.com/ubuntu/#mirror://mirrors.ubuntu.com/mirr
 ################################################################################
 
 # built-in packages
-ENV DEBIAN_FRONTEND noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
+
 RUN apt-get update \
     && apt-get install -y --no-install-recommends software-properties-common \
     curl apache2-utils \
-    apt-utils wget ca-certificates git nano less \
+    apt-utils wget ca-certificates git nano less dconf-cli \
     && apt-get install -y --no-install-recommends --allow-unauthenticated \
     supervisor nginx sudo net-tools zenity xz-utils \
     dbus-x11 x11-utils alsa-utils \

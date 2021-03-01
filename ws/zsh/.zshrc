@@ -46,6 +46,7 @@ alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
 alias pc='proxychains'
+alias tilix='LD_PRELOAD=/lib/aarch64-linux-gnu/libgcc_s.so.1 tilix'
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!

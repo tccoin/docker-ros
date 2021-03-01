@@ -2,6 +2,8 @@ ws/*
 !ws/zsh
 ws/zsh/*
 !ws/zsh/.zshrc
+!ws/config
+!ws/script
 
 vnc/web/novnc
 vnc/web/websockify

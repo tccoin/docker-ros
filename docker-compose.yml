@@ -6,7 +6,7 @@ networks:
 
 services:
   ros-master:
-    image: osrf/ros:noetic-desktop-full
+    image: tccoin/docker-ros:ros
     command: stdbuf -o L roscore
     networks:
       - ros
@@ -38,22 +38,22 @@ services:
     networks:
       - ros
     environment:
-      - "VNC_PW=rv666"
+      - "VNC_PASSWORD=rv6666"
       - "VNC_RESOLUTION=1280x720"
       - "ROS_MASTER_URI=http://ros-master:11311"
     ports:
-      - "5901:5901"
-      - "6901:6901"
+      - "5900:5900"
+      - "6900:80"
     privileged: true
     volumes:
-      - /etc/group:/etc/group:ro
-      - /etc/passwd:/etc/passwd:ro
-      - /etc/shadow:/etc/shadow:ro
-      - /etc/sudoers.d:/etc/sudoers.d:ro
       - ./ws:/root/ws:rw
       - ./ws/zsh/.zshrc:/root/.zshrc:rw
       - ./ws/zsh/.zsh_history:/root/.zsh_history:rw
+      - ./ws/config/.gtkrc-2.0.mine:/root/.gtkrc-2.0.mine:rw
+      - ./ws/config/rc.xml:/root/.config/openbox/rc.xml:rw
+      - ./ws/config/tilix.dconf:/root/tilix.dconf:rw
+      - ./ws/script/vnc.sh:/root/vnc.sh:rw
     stdin_open: true
     tty: true
-    # entrypoint: /bin/zsh
-    entrypoint: /bin/bash -c "(nohup /dockerstartup/vnc_startup.sh> vnc.log & ) && /bin/zsh"
+    entrypoint: /root/vnc.sh
+    
