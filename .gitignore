@@ -3,4 +3,5 @@ ws/*
 ws/zsh/*
 !ws/zsh/.zshrc
 
-vnc/vnc-container
+vnc/web/novnc
+vnc/web/websockify
