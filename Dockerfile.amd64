@@ -1,75 +1,124 @@
-FROM osrf/ros:noetic-desktop-full
+################################################################################
+# base system
+################################################################################
 
-###
-### PROXY
-###
+FROM osrf/ros:noetic-desktop-full as system
 
-# ENV HTTP_PROXY="http://172.17.0.1:10809"
-# ENV HTTPS_PROXY="http://172.17.0.1:10809"
-# ENV http_proxy="http://172.17.0.1:10809"
-# ENV https_proxy="http://172.17.0.1:10809"
+RUN sed -i 's#http://archive.ubuntu.com/ubuntu/#mirror://mirrors.ubuntu.com/mirrors.txt#' /etc/apt/sources.list;
+
+
+################################################################################
+# PROXY
+################################################################################
+
+# ENV HTTP_PROXY="http://192.168.0.187:10809"  \
+#     HTTPS_PROXY="http://192.168.0.187:10809" \
+#     http_proxy="http://192.168.0.187:10809"  \
+#     https_proxy="http://192.168.0.187:10809"
 
 # RUN sudo touch /etc/apt/apt.conf.d/proxy.conf \ 
-#     && sudo echo "Acquire::http::Proxy \"http://172.17.0.1:10809\";" > /etc/apt/apt.conf.d/proxy.conf \ 
-#     && sudo echo "Acquire::http::Proxy \"http://172.17.0.1:10809\";" >> /etc/apt/apt.conf.d/proxy.conf \ 
+#     && sudo echo "Acquire::http::Proxy \"http://192.168.0.187:10809\";" > /etc/apt/apt.conf.d/proxy.conf \ 
+#     && sudo echo "Acquire::http::Proxy \"http://192.168.0.187:10809\";" >> /etc/apt/apt.conf.d/proxy.conf \ 
 #     && sudo cat /etc/apt/apt.conf.d/proxy.conf
 
-###
-### VNC
-###
 
-ENV DISPLAY=:1 \
-    VNC_PORT=5901 \
-    NO_VNC_PORT=6901
-EXPOSE $VNC_PORT $NO_VNC_PORT
+################################################################################
+# VNC
+################################################################################
 
-### Envrionment config
-ENV HOME=/root \
-    TERM=xterm \
-    STARTUPDIR=/dockerstartup \
-    INST_SCRIPTS=/root/install \
-    NO_VNC_HOME=/root/noVNC \
-    DEBIAN_FRONTEND=noninteractive \
-    VNC_COL_DEPTH=24 \
-    VNC_RESOLUTION=1280x1024 \
-    VNC_PW=vncpassword \
-    VNC_VIEW_ONLY=false
-WORKDIR $HOME
+# built-in packages
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends software-properties-common \
+    curl apache2-utils \
+    apt-utils wget ca-certificates git nano less \
+    && apt-get install -y --no-install-recommends --allow-unauthenticated \
+    supervisor nginx sudo net-tools zenity xz-utils \
+    dbus-x11 x11-utils alsa-utils \
+    mesa-utils libgl1-mesa-dri \
+    && apt-get install -y --no-install-recommends --allow-unauthenticated \
+    xvfb x11vnc=0.9.16-3 \
+    vim-tiny ttf-ubuntu-font-family ttf-wqy-zenhei  \
+    && apt-get install -y --no-install-recommends --allow-unauthenticated \
+    lxde gtk2-engines-murrine gnome-themes-standard gtk2-engines-pixbuf gtk2-engines-murrine arc-theme \
+    && apt-get autoclean -y \
+    && apt-get autoremove -y \
+    && rm -rf /var/lib/apt/lists/*
 
-### Add all install scripts for further steps
-ADD ./src/common/install/ $INST_SCRIPTS/
-ADD ./src/ubuntu/install/ $INST_SCRIPTS/
-RUN find $INST_SCRIPTS -name '*.sh' -exec chmod a+x {} +
+# tini for subreap
+RUN curl https://github.com/krallin/tini/releases/download/v0.19.0/tini -o /bin/tini \ 
+    && chmod +x /bin/tini
 
-### Install some common tools
-RUN $INST_SCRIPTS/tools.sh
-ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en' LC_ALL='en_US.UTF-8'
+# ffmpeg
+RUN apt update \
+    && apt install -y --no-install-recommends --allow-unauthenticated \
+    ffmpeg \
+    && rm -rf /var/lib/apt/lists/* \
+    && mkdir /usr/local/ffmpeg \
+    && ln -s /usr/bin/ffmpeg /usr/local/ffmpeg/ffmpeg
 
-### Install custom fonts
-RUN $INST_SCRIPTS/install_custom_fonts.sh
+# python library
 
-### Install xvnc-server & noVNC - HTML5 based VNC viewer
-RUN $INST_SCRIPTS/tigervnc.sh
-RUN $INST_SCRIPTS/no_vnc.sh
+RUN wget https://raw.githubusercontent.com/tccoin/docker-ubuntu-vnc-desktop/develop/rootfs/usr/local/lib/web/backend/requirements.txt \
+    -O /tmp/requirements.txt \
+    && apt-get update \
+    && dpkg-query -W -f='${Package}\n' > /tmp/a.txt \
+    && apt-get install -y python3-pip python3-dev build-essential \
+    && pip3 install setuptools wheel && pip3 install -r /tmp/requirements.txt \
+    && dpkg-query -W -f='${Package}\n' > /tmp/b.txt \
+    && apt-get remove -y `diff --changed-group-format='%>' --unchanged-group-format='' /tmp/a.txt /tmp/b.txt | xargs` \
+    && apt-get autoclean -y \
+    && apt-get autoremove -y \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /var/cache/apt/* /tmp/a.txt /tmp/b.txt
 
-### Install firefox and chrome browser
-# RUN $INST_SCRIPTS/firefox.sh
-# RUN $INST_SCRIPTS/chrome.sh
 
-### Install xfce UI
-RUN $INST_SCRIPTS/xfce_ui.sh
-ADD ./src/common/xfce/ $HOME/
+###################
+# builder
+###################
+FROM ubuntu:focal as builder
 
-### configure startup
-RUN $INST_SCRIPTS/libnss_wrapper.sh
-ADD ./src/common/scripts $STARTUPDIR
-RUN $INST_SCRIPTS/set_user_permission.sh $STARTUPDIR $HOME
 
-RUN ln /bin/python2 /usr/bin/python
+RUN sed -i 's#http://archive.ubuntu.com/ubuntu/#mirror://mirrors.ubuntu.com/mirrors.txt#' /etc/apt/sources.list;
 
-###
-### Development Tools
-###
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl ca-certificates gnupg patch git
+
+# nodejs
+RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - \
+    && apt-get install -y nodejs
+
+# yarn
+RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
+    && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
+    && apt-get update \
+    && apt-get install -y yarn
+
+# build frontend
+RUN git clone --recursive https://github.com/tccoin/docker-ubuntu-vnc-desktop /src/docker-ubuntu-vnc-desktop \
+    && cp -r /src/docker-ubuntu-vnc-desktop/web /src/web
+RUN cd /src/web \
+    && yarn \
+    && yarn build
+RUN sed -i 's#app/locale/#novnc/app/locale/#' /src/web/dist/static/novnc/app/ui.js
+
+
+###################
+# merge
+###################
+FROM system
+
+COPY --from=builder /src/web/dist/ /usr/local/lib/web/frontend/
+COPY --from=builder /src/docker-ubuntu-vnc-desktop/rootfs/ /
+RUN ln -sf /usr/local/lib/web/frontend/static/websockify /usr/local/lib/web/frontend/static/novnc/utils/websockify \
+    && chmod +x /usr/local/lib/web/frontend/static/websockify/run \
+    && ln -s /usr/bin/python3 /usr/bin/python
+
+EXPOSE 80
+
+################################################################################
+# Development Tools
+################################################################################
 
 WORKDIR /root/ws
 ENV HOME=/root
@@ -126,9 +175,9 @@ RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -
     && bash ~/miniconda.sh -b -p $HOME/miniconda \
     && rm ~/miniconda.sh
 
-###
-### Program Dependency
-###
+################################################################################
+# Program Dependency
+################################################################################
 
 WORKDIR /root/build
 
@@ -159,6 +208,5 @@ RUN /root/miniconda/bin/pip3 install opencv-contrib-python pyserial toolz
 RUN cd ~/build/Galaxy_Linux_Python_2.0.2008.9111/api/ \
     && /root/miniconda/bin/pip3 install .
 
-RUN apt-get install -y ros-noetic-rqt ros-noetic-rqt-common-plugins
-
+HEALTHCHECK --interval=30s --timeout=5s CMD curl --fail http://127.0.0.1:6079/api/health
 ENTRYPOINT ["/bin/zsh"]
