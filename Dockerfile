@@ -1,18 +1,19 @@
 FROM arm64v8/ros:noetic-perception
+COPY qemu-arm-static /usr/bin
 
 ###
 ### PROXY
 ###
 
-# ENV HTTP_PROXY="http://172.17.0.1:10809"
-# ENV HTTPS_PROXY="http://172.17.0.1:10809"
-# ENV http_proxy="http://172.17.0.1:10809"
-# ENV https_proxy="http://172.17.0.1:10809"
+ENV HTTP_PROXY="http://192.168.0.187:10809"
+ENV HTTPS_PROXY="http://192.168.0.187:10809"
+ENV http_proxy="http://192.168.0.187:10809"
+ENV https_proxy="http://192.168.0.187:10809"
 
-# RUN sudo touch /etc/apt/apt.conf.d/proxy.conf \ 
-#     && sudo echo "Acquire::http::Proxy \"http://172.17.0.1:10809\";" > /etc/apt/apt.conf.d/proxy.conf \ 
-#     && sudo echo "Acquire::http::Proxy \"http://172.17.0.1:10809\";" >> /etc/apt/apt.conf.d/proxy.conf \ 
-#     && sudo cat /etc/apt/apt.conf.d/proxy.conf
+RUN sudo touch /etc/apt/apt.conf.d/proxy.conf \ 
+    && sudo echo "Acquire::http::Proxy \"http://192.168.0.187:10809\";" > /etc/apt/apt.conf.d/proxy.conf \ 
+    && sudo echo "Acquire::http::Proxy \"http://192.168.0.187:10809\";" >> /etc/apt/apt.conf.d/proxy.conf \ 
+    && sudo cat /etc/apt/apt.conf.d/proxy.conf
 
 ###
 ### VNC
@@ -25,6 +26,7 @@ EXPOSE $VNC_PORT $NO_VNC_PORT
 
 ### Envrionment config
 ENV HOME=/root \
+    USER=root \
     TERM=xterm \
     STARTUPDIR=/dockerstartup \
     INST_SCRIPTS=/root/install \
@@ -51,10 +53,6 @@ RUN $INST_SCRIPTS/install_custom_fonts.sh
 ### Install xvnc-server & noVNC - HTML5 based VNC viewer
 RUN $INST_SCRIPTS/tigervnc.sh
 RUN $INST_SCRIPTS/no_vnc.sh
-
-### Install firefox and chrome browser
-# RUN $INST_SCRIPTS/firefox.sh
-# RUN $INST_SCRIPTS/chrome.sh
 
 ### Install xfce UI
 RUN $INST_SCRIPTS/xfce_ui.sh
@@ -111,18 +109,19 @@ RUN sudo apt-get install -y \
 RUN git clone https://github.com/tccoin/easy-linux.git \
     && cd easy-linux \
     && ./zsh.sh \
-    && touch /root/.z
+    && touch /root/.z \
+    && rm /root/.zshrc
 
-ADD src/.zshrc /root
+# ADD src/.zshrc /root
 
 # install gitstatus
-# https://github.com/romkatv/gitstatus/releases/tag/v1.3.1
+# https://github.com/romkatv/gitstatus/releases/tag/v 1.3.1
 RUN mkdir -p /root/.cache/gitstatus \
-    && wget https://github.com/romkatv/gitstatus/releases/download/v1.3.1/gitstatusd-linux-x86_64.tar.gz -O - \
+    && wget https://github.com/romkatv/gitstatus/releases/download/v1.3.1/gitstatusd-linux-aarch64.tar.gz -O - \
     | tar -zx -C /root/.cache/gitstatus/
 
 # install conda
-RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh \
+RUN wget https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-aarch64.sh -O ~/miniconda.sh \
     && bash ~/miniconda.sh -b -p $HOME/miniconda \
     && rm ~/miniconda.sh
 
@@ -132,9 +131,9 @@ RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -
 
 WORKDIR /root/build
 
-RUN wget https://github.com/tccoin/container-static-files/releases/download/Galaxy_Linux/Galaxy_Linux-x86_Gige-U3_32bits-64bits_1.2.1911.9122.tar.gz -O - \
+RUN wget https://github.com/tccoin/container-static-files/releases/download/Galaxy_Linux/Galaxy_Linux-armhf_Gige-U3_32bits-64bits_1.3.1911.9271.tar.gz -O - \
     | tar -zx \
-    && cd Galaxy_Linux-x86_Gige-U3_32bits-64bits_1.2.1911.9122/ \
+    && cd Galaxy_Linux-armhf_Gige-U3_32bits-64bits_1.3.1911.9271/ \
     && echo '\n' | ./Galaxy_camera.run
 
 RUN wget https://github.com/tccoin/container-static-files/releases/download/Galaxy_Linux/Galaxy_Linux_Python_2.0.2008.9111.tar.gz -O - \
@@ -150,13 +149,13 @@ RUN mkdir -p catkin_ws/src \
     && source /opt/ros/noetic/setup.bash \
     && catkin_make
 
-RUN PATH="$HOME/miniconda/bin:$PATH" conda install -y numpy opencv=3.4.2 python=3.7 -c menpo
-
-RUN PATH="$HOME/miniconda/bin:$PATH" conda clean -afy
+RUN PATH="$HOME/miniconda/bin:$PATH" conda install -y opencv numpy python=3.7
 
 RUN /root/miniconda/bin/pip3 install opencv-contrib-python pyserial toolz
 
 RUN cd ~/build/Galaxy_Linux_Python_2.0.2008.9111/api/ \
     && /root/miniconda/bin/pip3 install .
+
+RUN apt-get install -y ros-noetic-rqt ros-noetic-rqt-common-plugins
 
 ENTRYPOINT ["/bin/zsh"]

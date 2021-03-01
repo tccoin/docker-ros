@@ -1,4 +1,5 @@
 FROM arm64v8/ros:noetic-perception
+COPY qemu-arm-static /usr/bin
 
 ###
 ### PROXY
@@ -108,16 +109,21 @@ RUN sudo apt-get install -y \
 RUN git clone https://github.com/tccoin/easy-linux.git \
     && cd easy-linux \
     && ./zsh.sh \
-    && touch /root/.z
+    && touch /root/.z \
+    && rm /root/.zshrc
 
 # ADD src/.zshrc /root
 
 # install gitstatus
-# https://github.com/romkatv/gitstatus/releases/tag/v1.3.1
+# https://github.com/romkatv/gitstatus/releases/tag/v 1.3.1
 RUN mkdir -p /root/.cache/gitstatus \
-    && wget https://github.com/romkatv/gitstatus/releases/download/v1.3.1/gitstatusd-darwin-arm64.tar.gz -O - \
+    && wget https://github.com/romkatv/gitstatus/releases/download/v1.3.1/gitstatusd-linux-aarch64.tar.gz -O - \
     | tar -zx -C /root/.cache/gitstatus/
 
+# install conda
+RUN wget https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-aarch64.sh -O ~/miniconda.sh \
+    && bash ~/miniconda.sh -b -p $HOME/miniconda \
+    && rm ~/miniconda.sh
 
 ###
 ### Program Dependency
@@ -143,9 +149,13 @@ RUN mkdir -p catkin_ws/src \
     && source /opt/ros/noetic/setup.bash \
     && catkin_make
 
-# RUN pip3 install opencv-contrib-python pyserial toolz numpy opencv==3.4.2
+RUN PATH="$HOME/miniconda/bin:$PATH" conda install -y opencv numpy python=3.7
 
-# # RUN cd ~/build/Galaxy_Linux_Python_2.0.2008.9111/api/ \
-# #     && pip3 install .
+RUN /root/miniconda/bin/pip3 install opencv-contrib-python pyserial toolz
 
-# # ENTRYPOINT ["/bin/zsh"]
+RUN cd ~/build/Galaxy_Linux_Python_2.0.2008.9111/api/ \
+    && /root/miniconda/bin/pip3 install .
+
+RUN apt-get install -y ros-noetic-rqt ros-noetic-rqt-common-plugins
+
+ENTRYPOINT ["/bin/zsh"]

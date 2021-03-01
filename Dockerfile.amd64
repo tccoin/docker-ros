@@ -159,4 +159,6 @@ RUN /root/miniconda/bin/pip3 install opencv-contrib-python pyserial toolz
 RUN cd ~/build/Galaxy_Linux_Python_2.0.2008.9111/api/ \
     && /root/miniconda/bin/pip3 install .
 
+RUN apt-get install -y ros-noetic-rqt ros-noetic-rqt-common-plugins
+
 ENTRYPOINT ["/bin/zsh"]
