@@ -38,7 +38,7 @@ services:
       - /home/<your_user>:/home/<your_user>:rw #share your home with write permissions
     command: /bin/bash -c "source /root/ws/install/local_setup.bash && roslaunch --wait kinect2_bridge kinect2_bridge.launch"
 
-  kinect-shell:
+  shell:
     image: tccoin/docker-ros:kinect
     container_name: kinect-shell
     networks:
@@ -48,8 +48,6 @@ services:
       - "ROS_HOSTNAME=kinect"
       - "DISPLAY"
       - "QT_X11_NO_MITSHM=1" #fix some QT bugs
-    #share your user to the container in order to access your x11
-    # user: 1000:1000 #adapt as needed!
     privileged: true
     volumes: 
       #share your x11 socket and permissions to the container
@@ -59,7 +57,6 @@ services:
       - /etc/passwd:/etc/passwd:ro
       - /etc/shadow:/etc/shadow:ro
       - /etc/sudoers.d:/etc/sudoers.d:ro
-      - /home/<your_user>:/home/<your_user>:rw #share your home with write permissions
     # command: /bin/bash -c "source /root/ws/install/local_setup.bash"
     stdin_open: true # docker run -i
     tty: true        # docker run -t
