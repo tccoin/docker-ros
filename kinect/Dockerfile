@@ -37,8 +37,7 @@ RUN sed -i "/^# deb.*multiverse/ s/^# //" /etc/apt/sources.list \
     opencl-headers \
     openni2-utils \
     pkg-config \
-    udev \
-    && rm -rf /var/lib/apt/lists/*
+    udev
 
 RUN mkdir src \ 
     && cd src \ 
