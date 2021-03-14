@@ -56,3 +56,30 @@ services:
     stdin_open: true # docker run -i
     tty: true        # docker run -t
     entrypoint: /bin/bash
+  vnc:
+    image: tccoin/docker-ros:kinect
+    depends_on:
+      - ros-master
+    container_name: vnc
+    networks:
+      - ros
+    environment:
+      - "VNC_PASSWORD=rv6666"
+      - "VNC_RESOLUTION=1280x720"
+      - "ROS_MASTER_URI=http://ros-master:11311"
+    ports:
+      - "5900:5900"
+      - "6900:80"
+    privileged: true
+    volumes:
+      # - ../ws:/root/ws:rw
+      - ../ws/zsh/.zshrc:/root/.zshrc:rw
+      - ../ws/zsh/.zsh_history:/root/.zsh_history:rw
+      - ../ws/config/.gtkrc-2.0.mine:/root/.gtkrc-2.0.mine:rw
+      - ../ws/config/rc.xml:/root/.config/openbox/rc.xml:rw
+      - ../ws/config/tilix.dconf:/root/tilix.dconf:rw
+      - ../ws/script/vnc.sh:/root/vnc.sh:rw
+    stdin_open: true
+    tty: true
+    entrypoint: /root/vnc.sh
+    
