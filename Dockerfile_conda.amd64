@@ -149,13 +149,7 @@ RUN sed -i "/^# deb.*multiverse/ s/^# //" /etc/apt/sources.list \
     ros-${ROS_DISTRO}-ros-base \
     ros-${ROS_DISTRO}-catkin \
     build-essential \
-    ros-${ROS_DISTRO}-catkin \
-    python3-colcon-common-extensions \
-    python3-catkin-tools \
-    python3-osrf-pycommon \
-    python3-rosdep \
-    python3-wstool\
-    python3-pip
+    ros-${ROS_DISTRO}-catkin
 
 WORKDIR /root/build
 
@@ -176,6 +170,18 @@ ADD src/.zshrc /root
 RUN mkdir -p /root/.cache/gitstatus \
     && wget https://github.com/romkatv/gitstatus/releases/download/v1.3.1/gitstatusd-linux-x86_64.tar.gz -O - \
     | tar -zx -C /root/.cache/gitstatus/
+
+# install conda
+RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh \
+    && bash ~/miniconda.sh -b -p $HOME/miniconda \
+    && rm ~/miniconda.sh \
+    && /root/miniconda/bin/conda install -y python=3.7
+
+RUN cp /usr/lib/python3/dist-packages/lsb_release.py /root/miniconda/lib/python3.7/ \
+    && rm /usr/bin/python3 \
+    && ln /root/miniconda/bin/python3.7 /usr/bin/python3 -s  \
+    && /root/miniconda/bin/pip3 install rosdep rospkg rosinstall_generator rosinstall wstool vcstools catkin_tools catkin_pkg osrf-pycommon colcon-common-extensions defusedxml netifaces \
+    && /root/miniconda/bin/pip3 install supervisor==4.1.0 gevent flask gevent-websocket 
 
 # ################################################################################
 # # Program Dependency
@@ -201,10 +207,13 @@ RUN mkdir -p catkin_ws/src \
     && source /opt/ros/noetic/setup.bash \
     && catkin_make
 
-RUN pip3 install numpy 'opencv-python>=3.4,<3.5' 'opencv-contrib-python>=3.4,<3.5' pyserial toolz pyyaml bitstring
+RUN /root/miniconda/bin/conda install -y numpy opencv=3.4.2 -c menpo \
+    && /root/miniconda/bin/conda clean -afy
+
+RUN /root/miniconda/bin/pip3 install opencv-contrib-python pyserial toolz pyyaml bitstring
 
 RUN cd ~/build/Galaxy_Linux_Python_2.0.2008.9111/api/ \
-    && pip3 install .
+    && /root/miniconda/bin/pip3 install .
 
 HEALTHCHECK --interval=30s --timeout=5s CMD curl --fail http://127.0.0.1:6079/api/health
 ENTRYPOINT ["/bin/zsh"]
