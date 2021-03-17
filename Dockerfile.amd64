@@ -182,6 +182,8 @@ RUN mkdir -p /root/.cache/gitstatus \
 # # Program Dependency
 # ################################################################################
 
+SHELL ["/bin/bash", "-l", "-c"]
+
 WORKDIR /root/build
 
 RUN wget https://github.com/tccoin/container-static-files/releases/download/Galaxy_Linux/Galaxy_Linux-x86_Gige-U3_32bits-64bits_1.2.1911.9122.tar.gz -O - \
@@ -200,8 +202,6 @@ RUN apt-get install --no-install-recommends -y libusb-dev \
     && make all
 
 WORKDIR /root
-
-SHELL ["/bin/bash", "-l", "-c"]
 
 RUN mkdir -p catkin_ws/src \
     && cd catkin_ws \
