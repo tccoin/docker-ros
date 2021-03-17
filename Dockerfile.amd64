@@ -11,15 +11,15 @@ RUN sed -i 's#http://archive.ubuntu.com/ubuntu/#mirror://mirrors.ubuntu.com/mirr
 # PROXY
 ################################################################################
 
-# ENV HTTP_PROXY="http://192.168.0.187:10809"  \
-#     HTTPS_PROXY="http://192.168.0.187:10809" \
-#     http_proxy="http://192.168.0.187:10809"  \
-#     https_proxy="http://192.168.0.187:10809"
+ENV HTTP_PROXY="http://192.168.0.187:10809"  \
+    HTTPS_PROXY="http://192.168.0.187:10809" \
+    http_proxy="http://192.168.0.187:10809"  \
+    https_proxy="http://192.168.0.187:10809"
 
-# RUN sudo touch /etc/apt/apt.conf.d/proxy.conf \ 
-#     && sudo echo "Acquire::http::Proxy \"http://192.168.0.187:10809\";" > /etc/apt/apt.conf.d/proxy.conf \ 
-#     && sudo echo "Acquire::http::Proxy \"http://192.168.0.187:10809\";" >> /etc/apt/apt.conf.d/proxy.conf \ 
-#     && sudo cat /etc/apt/apt.conf.d/proxy.conf
+RUN sudo touch /etc/apt/apt.conf.d/proxy.conf \ 
+    && sudo echo "Acquire::http::Proxy \"http://192.168.0.187:10809\";" > /etc/apt/apt.conf.d/proxy.conf \ 
+    && sudo echo "Acquire::http::Proxy \"http://192.168.0.187:10809\";" >> /etc/apt/apt.conf.d/proxy.conf \ 
+    && sudo cat /etc/apt/apt.conf.d/proxy.conf
 
 
 ################################################################################
@@ -97,8 +97,8 @@ RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
 # ################################################################################
 # # PROXY
 # ################################################################################
-# RUN git config --global http.proxy http://192.168.0.187:10809 \
-#     && git config --global https.proxy http://192.168.0.187:10809
+RUN git config --global http.proxy http://192.168.0.187:10809 \
+    && git config --global https.proxy http://192.168.0.187:10809
 
 # build frontend
 RUN git clone --recursive https://github.com/tccoin/docker-ubuntu-vnc-desktop /src/docker-ubuntu-vnc-desktop \
@@ -190,6 +190,14 @@ RUN wget https://github.com/tccoin/container-static-files/releases/download/Gala
 
 RUN wget https://github.com/tccoin/container-static-files/releases/download/Galaxy_Linux/Galaxy_Linux_Python_2.0.2008.9111.tar.gz -O - \
     | tar -zx
+
+RUN apt-get install --no-install-recommends -y libusb-dev \
+    && git clone https://github.com/slightech/MYNT-EYE-D-SDK.git mynt-eye-d-sdk
+
+RUN cd mynt-eye-d-sdk \
+    && make init \
+    && source /opt/ros/noetic/setup.bash \
+    && make ros
 
 WORKDIR /root
 
