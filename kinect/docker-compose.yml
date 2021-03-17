@@ -11,29 +11,6 @@ services:
     networks:
       - ros
     restart: always
-
-  kinect:
-    image: tccoin/docker-ros:kinect
-    container_name: kinect
-    depends_on:
-      - ros-master
-    networks:
-      - ros
-    environment:
-      - "ROS_MASTER_URI=http://ros-master:11311"
-      - "DISPLAY"
-      - "QT_X11_NO_MITSHM=1" #fix some QT bugs
-    privileged: true
-    volumes: 
-      #share your x11 socket and permissions to the container
-      - /tmp/.X11-unix:/tmp/.X11-unix:rw
-      - /usr/lib/x86_64-linux-gnu/libXv.so.1:/usr/lib/x86_64-linux-gnu/libXv.so.1
-      - /etc/group:/etc/group:ro
-      - /etc/passwd:/etc/passwd:ro
-      - /etc/shadow:/etc/shadow:ro
-      - /etc/sudoers.d:/etc/sudoers.d:ro
-    entrypoint: /bin/bash -c "source /opt/ros/noetic/local_setup.bash && source /root/ws/install/local_setup.bash && roslaunch --wait kinect2_bridge kinect2_bridge.launch"
-
   shell:
     image: tccoin/docker-ros:kinect
     container_name: kinect-shell

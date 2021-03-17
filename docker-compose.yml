@@ -85,3 +85,57 @@ services:
     stdin_open: true
     tty: true
     entrypoint: /root/vnc.sh
+    
+  mynt:
+    image: tccoin/docker-ros
+    depends_on:
+      - ros-master
+    container_name: mynt
+    networks:
+      - ros
+    environment:
+      - "ROS_MASTER_URI=http://ros-master:11311"
+    privileged: true
+    entrypoint: /bin/bash -c "source /root/build/mynt-eye-d-sdk/wrappers/ros/devel/setup.bash && rosrun mynteye_wrapper_d mynteye_wrapper_d_node" 
+
+  kinect:
+    image: tccoin/docker-ros:kinect
+    container_name: kinect
+    depends_on:
+      - ros-master
+    networks:
+      - ros
+    environment:
+      - "ROS_MASTER_URI=http://ros-master:11311"
+      - "DISPLAY"
+      - "QT_X11_NO_MITSHM=1" #fix some QT bugs
+    privileged: true
+    volumes: 
+      #share your x11 socket and permissions to the container
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /usr/lib/x86_64-linux-gnu/libXv.so.1:/usr/lib/x86_64-linux-gnu/libXv.so.1
+      - /etc/group:/etc/group:ro
+      - /etc/passwd:/etc/passwd:ro
+      - /etc/shadow:/etc/shadow:ro
+      - /etc/sudoers.d:/etc/sudoers.d:ro
+    entrypoint: /bin/bash -c "source /opt/ros/noetic/local_setup.bash && source /root/ws/install/local_setup.bash && roslaunch --wait kinect2_bridge kinect2_bridge.launch"
+
+  rosbridge:
+    image: tccoin/docker-ros:rosbridge
+    container_name: rosbridge
+    depends_on:
+      - ros-master
+    environment:
+      - "ROS_MASTER_URI=http://ros-master:11311"
+    ports:
+      - "9090:9090"
+    networks:
+      - ros
+
+  webviz:
+    image: cruise/webviz
+    container_name: webviz
+    depends_on:
+      - rosbridge
+    ports:
+      - "7901:8080"

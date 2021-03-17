@@ -148,6 +148,7 @@ RUN sed -i "/^# deb.*multiverse/ s/^# //" /etc/apt/sources.list \
     less \
     ros-${ROS_DISTRO}-ros-base \
     ros-${ROS_DISTRO}-catkin \
+    ros-${ROS_DISTRO}-rosbridge-suite \
     build-essential \
     ros-${ROS_DISTRO}-catkin \
     python3-colcon-common-extensions \
@@ -192,12 +193,11 @@ RUN wget https://github.com/tccoin/container-static-files/releases/download/Gala
     | tar -zx
 
 RUN apt-get install --no-install-recommends -y libusb-dev \
-    && git clone https://github.com/slightech/MYNT-EYE-D-SDK.git mynt-eye-d-sdk
-
-RUN cd mynt-eye-d-sdk \
+    && git clone https://github.com/tccoin/MYNT-EYE-D-SDK.git mynt-eye-d-sdk \
+    && cd mynt-eye-d-sdk \
     && make init \
     && source /opt/ros/noetic/setup.bash \
-    && make ros
+    && make all
 
 WORKDIR /root
 
