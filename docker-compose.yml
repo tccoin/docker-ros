@@ -121,7 +121,7 @@ services:
     entrypoint: /bin/bash -c "source /opt/ros/noetic/local_setup.bash && source /root/ws/install/local_setup.bash && roslaunch --wait kinect2_bridge kinect2_bridge.launch"
 
   rosbridge:
-    image: tccoin/docker-ros:rosbridge
+    image: tccoin/docker-ros
     container_name: rosbridge
     depends_on:
       - ros-master
@@ -131,6 +131,7 @@ services:
       - "9090:9090"
     networks:
       - ros
+    entrypoint: /bin/bash -c "source /opt/ros/noetic/setup.bash && roslaunch rosbridge_server rosbridge_websocket.launch"
 
   webviz:
     image: cruise/webviz
