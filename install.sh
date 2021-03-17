@@ -9,5 +9,10 @@ elif [[ $architecture == "amd64" ]]; then
 fi
 
 # create workspace
+rm -rf ws/zsh/.zsh_history > /dev/null
+rm -rf ws/autoaim > /dev/null
+rm -rf ws/zsh/.zsh_history > /dev/null
 touch ws/zsh/.zsh_history
 git clone https://github.com/RoboVigor/RV-AutoAim ws/autoaim
+git clone https://github.com/RoboVigor/RV-Node-Bridge-ROS-wrapper.git ws/node-bridge-ros-wrapper
+git clone https://github.com/RoboVigor/RV-Node-Bridge ws/node-bridge-ros-wrapper/node-bridge
