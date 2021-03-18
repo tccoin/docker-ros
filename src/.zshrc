@@ -1,2 +1,0 @@
-export HOME=/root
-zsh
