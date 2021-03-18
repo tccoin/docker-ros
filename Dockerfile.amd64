@@ -170,8 +170,6 @@ RUN git clone https://github.com/tccoin/easy-linux.git \
     && ./zsh.sh \
     && touch /root/.z
 
-ADD src/.zshrc /root
-
 # install gitstatus
 # https://github.com/romkatv/gitstatus/releases/tag/v1.3.1
 RUN mkdir -p /root/.cache/gitstatus \
@@ -205,7 +203,7 @@ WORKDIR /root
 
 RUN mkdir -p catkin_ws/src \
     && cd catkin_ws \
-    && git clone https://github.com/tccoin/galaxy_camera.git src/galaxy_camera \
+    && git clone https://github.com/tccoin/galaxy_camera.git src/galaxy_camera \ 
     && source /opt/ros/noetic/setup.bash \
     && catkin_make
 
