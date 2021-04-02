@@ -15,15 +15,15 @@ RUN sed -i 's#http://archive.ubuntu.com/ubuntu/#mirror://mirrors.ubuntu.com/mirr
 # PROXY
 ################################################################################
 
-# ENV HTTP_PROXY="http://192.168.0.187:10809"  \
-#     HTTPS_PROXY="http://192.168.0.187:10809" \
-#     http_proxy="http://192.168.0.187:10809"  \
-#     https_proxy="http://192.168.0.187:10809"
+ENV HTTP_PROXY="http://192.168.0.119:10809"  \
+    HTTPS_PROXY="http://192.168.0.119:10809" \
+    http_proxy="http://192.168.0.119:10809"  \
+    https_proxy="http://192.168.0.119:10809"
 
-# RUN sudo touch /etc/apt/apt.conf.d/proxy.conf \ 
-#     && sudo echo "Acquire::http::Proxy \"http://192.168.0.187:10809\";" > /etc/apt/apt.conf.d/proxy.conf \ 
-#     && sudo echo "Acquire::http::Proxy \"http://192.168.0.187:10809\";" >> /etc/apt/apt.conf.d/proxy.conf \ 
-#     && sudo cat /etc/apt/apt.conf.d/proxy.conf
+RUN sudo touch /etc/apt/apt.conf.d/proxy.conf \ 
+    && sudo echo "Acquire::http::Proxy \"http://192.168.0.119:10809\";" > /etc/apt/apt.conf.d/proxy.conf \ 
+    && sudo echo "Acquire::http::Proxy \"http://192.168.0.119:10809\";" >> /etc/apt/apt.conf.d/proxy.conf \ 
+    && sudo cat /etc/apt/apt.conf.d/proxy.conf
 
 
 ################################################################################
@@ -77,6 +77,20 @@ RUN wget https://raw.githubusercontent.com/tccoin/docker-ubuntu-vnc-desktop/deve
 # builder
 ###################
 FROM ubuntu:focal as builder
+
+################################################################################
+# PROXY
+################################################################################
+
+ENV HTTP_PROXY="http://192.168.0.119:10809"  \
+    HTTPS_PROXY="http://192.168.0.119:10809" \
+    http_proxy="http://192.168.0.119:10809"  \
+    https_proxy="http://192.168.0.119:10809"
+
+RUN touch /etc/apt/apt.conf.d/proxy.conf \ 
+    && echo "Acquire::http::Proxy \"http://192.168.0.119:10809\";" > /etc/apt/apt.conf.d/proxy.conf \ 
+    && echo "Acquire::http::Proxy \"http://192.168.0.119:10809\";" >> /etc/apt/apt.conf.d/proxy.conf \ 
+    && cat /etc/apt/apt.conf.d/proxy.conf
 
 
 RUN sed -i 's#http://archive.ubuntu.com/ubuntu/#mirror://mirrors.ubuntu.com/mirrors.txt#' /etc/apt/sources.list;
@@ -159,22 +173,17 @@ RUN git clone https://github.com/tccoin/easy-linux.git \
     && touch /root/.z \
     && rm /root/.zshrc
 
-# ADD src/.zshrc /root
-
 # install gitstatus
 # https://github.com/romkatv/gitstatus/releases/tag/v 1.3.1
 RUN mkdir -p /root/.cache/gitstatus \
     && wget https://github.com/romkatv/gitstatus/releases/download/v1.3.1/gitstatusd-linux-aarch64.tar.gz -O - \
     | tar -zx -C /root/.cache/gitstatus/
 
-# install conda
-RUN wget https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-aarch64.sh -O ~/miniconda.sh \
-    && bash ~/miniconda.sh -b -p $HOME/miniconda \
-    && rm ~/miniconda.sh
-
 ################################################################################
 # Program Dependency
 ################################################################################
+
+SHELL ["/bin/bash", "-l", "-c"]
 
 WORKDIR /root/build
 
@@ -186,9 +195,14 @@ RUN wget https://github.com/tccoin/container-static-files/releases/download/Gala
 RUN wget https://github.com/tccoin/container-static-files/releases/download/Galaxy_Linux/Galaxy_Linux_Python_2.0.2008.9111.tar.gz -O - \
     | tar -zx
 
-WORKDIR /root
+RUN apt-get install --no-install-recommends -y libusb-dev \
+    && git clone https://github.com/tccoin/MYNT-EYE-D-SDK.git mynt-eye-d-sdk \
+    && cd mynt-eye-d-sdk \
+    && make init \
+    && source /opt/ros/noetic/setup.bash \
+    && make all
 
-SHELL ["/bin/bash", "-l", "-c"]
+WORKDIR /root
 
 RUN mkdir -p catkin_ws/src \
     && cd catkin_ws \
@@ -196,16 +210,19 @@ RUN mkdir -p catkin_ws/src \
     && source /opt/ros/noetic/setup.bash \
     && catkin_make
 
-RUN PATH="$HOME/miniconda/bin:$PATH" conda install -y opencv numpy python=3.7
+RUN apt-get install -y python3-pip
 
-RUN /root/miniconda/bin/pip3 install opencv-contrib-python pyserial toolz
+RUN pip3 install numpy 'opencv-python>=3.4,<3.5' 'opencv-contrib-python>=3.4,<3.5' pyserial toolz pyyaml bitstring
 
 RUN cd ~/build/Galaxy_Linux_Python_2.0.2008.9111/api/ \
-    && /root/miniconda/bin/pip3 install .
+    && pip3 install .
 
-RUN apt-get install -y ros-noetic-rqt ros-noetic-rqt-common-plugins
-
-RUN sed 's#!\/usr\/bin\/env #!\/usr\/bin#' /usr/local/lib/web/backend/run.py
+RUN apt-get install -y \
+    ros-${ROS_DISTRO}-rosbridge-suite \
+    ros-${ROS_DISTRO}-rqt \
+    ros-${ROS_DISTRO}-rqt-common-plugins \
+    ros-${ROS_DISTRO}-rviz \
+    ros-${ROS_DISTRO}-rqt-rviz
 
 HEALTHCHECK --interval=30s --timeout=5s CMD curl --fail http://127.0.0.1:6079/api/health
 ENTRYPOINT ["/bin/zsh"]
