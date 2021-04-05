@@ -18,3 +18,8 @@ export DISPLAY=:1
 cd /root/build/ORB_SLAM3/
 source Examples/ROS/ORB_SLAM3/build/devel/setup.zsh
 rosrun ORB_SLAM3 Stereo_Inertial ./Vocabulary/ORBvoc.txt ./config/mynteye_d_stereo.yaml data_raw true
+
+# rosbag record --duration=30 -o subset /imu /camera/left/image_raw  /camera/right/image_raw
+# rosrun image_transport republish compressed in:=/camera/left/image_raw raw out:=/camera/left/image_raw &
+# rosrun image_transport republish compressed in:=/camera/right/image_raw raw out:=/camera/right/image_raw &
+# rosbag play -r 0.1 -q /root/ws/_2021-04-03-09-17-19.bag
