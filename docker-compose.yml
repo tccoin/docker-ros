@@ -219,3 +219,32 @@ services:
       - rosbridge
     ports:
       - "7900:8080"
+
+  manipulator:
+    image: tccoin/docker-ros:manipulator
+    depends_on:
+      - ros-master
+    container_name: manipulator
+    networks:
+      - ros
+    environment:
+      - "VNC_PASSWORD=rv6666"
+      - "VNC_RESOLUTION=1920x1080"
+      - "ROS_MASTER_URI=http://ros-master:11311"
+    ports:
+      - "5900:5900"
+      - "6900:80"
+    privileged: true
+    volumes:
+      - ./ws:/root/ws:rw
+      - ./ws/zsh/.zshrc:/root/.zshrc:rw
+      - ./ws/zsh/.zsh_history:/root/.zsh_history:rw
+      - ./ws/config/.gtkrc-2.0.mine:/root/.gtkrc-2.0.mine:rw
+      - ./ws/config/rc.xml:/root/.config/openbox/rc.xml:rw
+      - ./ws/config/tilix.dconf:/root/tilix.dconf:rw
+      - ./ws/node-bridge-ros:/root/catkin_ws/src/node_bridge_ros:rw
+      - ./ws/node-bridge:/root/catkin_ws/src/node_bridge_ros/include/node_bridge/:rw
+      - ./ws/script/vnc.sh:/root/vnc.sh:rw
+      - ./ws/script/manipulator.sh:/root/manipulator.sh:rw
+    # entrypoint: /root/manipulator.sh
+    entrypoint: /root/vnc.sh
