@@ -124,7 +124,8 @@ services:
     environment:
       - "ROS_MASTER_URI=http://ros-master:11311"
     privileged: true
-    entrypoint: /bin/bash -c "source /root/build/mynt-eye-d-sdk/wrappers/ros/devel/setup.bash && roslaunch mynteye_wrapper_d mynteye.launch left_color_topic:=/camera/left/image_raw right_color_topic:=/camera/right/image_raw ir_intensity:=4 stream_mode:=3 framerate:=30 imu_topic:=/imu" 
+    # entrypoint: /bin/bash -c "source /root/build/mynt-eye-d-sdk/wrappers/ros/devel/setup.bash && roslaunch mynteye_wrapper_d mynteye.launch left_color_topic:=/camera/left/image_raw right_color_topic:=/camera/right/image_raw ir_intensity:=4 stream_mode:=3 framerate:=30 imu_topic:=/imu" 
+    entrypoint: /bin/bash -c "source /root/build/mynt-eye-d-sdk/wrappers/ros/devel/setup.bash && roslaunch mynteye_wrapper_d mynteye.launch ir_intensity:=4 stream_mode:=3 framerate:=30"
     
     
   mynt-slam:
@@ -203,10 +204,18 @@ services:
       - ros
     entrypoint: /bin/bash -c "source /opt/ros/noetic/setup.bash && roslaunch rosbridge_server rosbridge_websocket.launch"
 
-  webviz:
+  webviz-arm:
     image: frankjoshua/ros-webviz
     container_name: webviz
     depends_on:
       - rosbridge
     ports:
       - "7900:80"
+      
+  webviz:
+    image: cruise/webviz
+    container_name: webviz
+    depends_on:
+      - rosbridge
+    ports:
+      - "7900:8080"
