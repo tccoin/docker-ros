@@ -2,14 +2,6 @@ FROM tccoin/docker-ros
 
 WORKDIR /root/build
 
-RUN git config --global http.proxy socks5://192.168.0.119:10808 \
-    && git config --global https.proxy socks5://192.168.0.119:10808
-
-ENV HTTP_PROXY="http://192.168.0.119:10809"  \
-    HTTPS_PROXY="http://192.168.0.119:10809" \
-    http_proxy="http://192.168.0.119:10809"  \
-    https_proxy="http://192.168.0.119:10809"
-
 RUN sudo touch /etc/apt/apt.conf.d/proxy.conf \ 
     && sudo echo "Acquire::http::Proxy \"http://192.168.0.119:10809\";" > /etc/apt/apt.conf.d/proxy.conf \ 
     && sudo echo "Acquire::http::Proxy \"http://192.168.0.119:10809\";" >> /etc/apt/apt.conf.d/proxy.conf \ 
