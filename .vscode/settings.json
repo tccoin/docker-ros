@@ -1,5 +1,6 @@
 {
     "files.associations": {
         "random": "cpp"
-    }
+    },
+    "python.pythonPath": "/home/link/miniconda3/envs/robotics/bin/python"
 }

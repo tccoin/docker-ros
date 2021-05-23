@@ -8,7 +8,8 @@
 1. Install Docker Compose:
 https://docs.docker.com/compose/install/
 1. Setup proxy:
-https://docs.docker.com/config/daemon/systemd/
+https://docs.docker.com/network/proxy/#use-environment-variables
+https://jingsam.github.io/2018/10/16/host-in-docker.html
 1. Setup workspace:
     ```
     bash install.sh

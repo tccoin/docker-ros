@@ -8,21 +8,6 @@ RUN sed -i 's#http://archive.ubuntu.com/ubuntu/#mirror://mirrors.ubuntu.com/mirr
 
 
 ################################################################################
-# PROXY
-################################################################################
-
-# ENV HTTP_PROXY="http://192.168.0.187:10809"  \
-#     HTTPS_PROXY="http://192.168.0.187:10809" \
-#     http_proxy="http://192.168.0.187:10809"  \
-#     https_proxy="http://192.168.0.187:10809"
-
-# RUN sudo touch /etc/apt/apt.conf.d/proxy.conf \ 
-#     && sudo echo "Acquire::http::Proxy \"http://192.168.0.187:10809\";" > /etc/apt/apt.conf.d/proxy.conf \ 
-#     && sudo echo "Acquire::http::Proxy \"http://192.168.0.187:10809\";" >> /etc/apt/apt.conf.d/proxy.conf \ 
-#     && sudo cat /etc/apt/apt.conf.d/proxy.conf
-
-
-################################################################################
 # VNC
 ################################################################################
 
@@ -93,12 +78,6 @@ RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
     && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
     && apt-get update \
     && apt-get install -y yarn
-
-# ################################################################################
-# # PROXY
-# ################################################################################
-# RUN git config --global http.proxy http://192.168.0.187:10809 \
-#     && git config --global https.proxy http://192.168.0.187:10809
 
 # build frontend
 RUN git clone --recursive https://github.com/tccoin/docker-ubuntu-vnc-desktop /src/docker-ubuntu-vnc-desktop \

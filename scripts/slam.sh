@@ -23,4 +23,4 @@ rosrun ORB_SLAM3 Stereo_Inertial ./Vocabulary/ORBvoc.txt ./config/mynteye_d_ster
 rosrun image_transport republish compressed in:=/camera/left/image_raw raw out:=/camera/left/image_raw &
 rosrun image_transport republish compressed in:=/camera/right/image_raw raw out:=/camera/right/image_raw &
 # rosbag play -r 0.1 -q /root/ws/_2021-04-03-09-17-19.bag
-rosrun camera_calibration cameracalibrator.py --approximate 0.1 --size 8x6 --square 0.108 right:=/mynteye/right/image_raw left:=/mynteye/left/image_raw right_camera:=/mynteye/right left_camera:=/mynteye/left
+rosrun camera_calibration cameracalibrator.py --approximate 0.1 --size 8x6 --square 0.108 right:=/mynteye/right/image_color left:=/mynteye/left/image_color right_camera:=/mynteye/right left_camera:=/mynteye/left --no-service-check

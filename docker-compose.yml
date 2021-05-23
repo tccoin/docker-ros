@@ -52,7 +52,7 @@ services:
       - ./ws/config/.gtkrc-2.0.mine:/root/.gtkrc-2.0.mine:rw
       - ./ws/config/rc.xml:/root/.config/openbox/rc.xml:rw
       - ./ws/config/tilix.dconf:/root/tilix.dconf:rw
-      - ./ws/script/vnc.sh:/root/vnc.sh:rw
+      - ./scripts/vnc.sh:/root/vnc.sh:rw
     stdin_open: true
     tty: true
     entrypoint: /bin/zsh
@@ -80,13 +80,27 @@ services:
       - ./ws/config/.gtkrc-2.0.mine:/root/.gtkrc-2.0.mine:rw
       - ./ws/config/rc.xml:/root/.config/openbox/rc.xml:rw
       - ./ws/config/tilix.dconf:/root/tilix.dconf:rw
-      - ./ws/script/vnc.sh:/root/vnc.sh:rw
+      - ./scripts/vnc.sh:/root/vnc.sh:rw
     stdin_open: true
     tty: true
     entrypoint: /root/vnc.sh
     
   node-bridge:
-    image: tccoin/docker-ros
+    image: tccoin/docker-ros:node-bridge
+    depends_on:
+      - ros-master
+    container_name: node-bridge
+    networks:
+      - ros
+    environment:
+      - "ROS_MASTER_URI=http://ros-master:11311"
+    privileged: true
+    volumes:
+      - ./scripts/node-bridge.sh:/root/node-bridge.sh:rw
+    entrypoint: /root/node-bridge.sh
+    
+  node-bridge-vnc:
+    image: tccoin/docker-ros:node-bridge
     depends_on:
       - ros-master
     container_name: node-bridge
@@ -107,9 +121,8 @@ services:
       - ./ws/config/.gtkrc-2.0.mine:/root/.gtkrc-2.0.mine:rw
       - ./ws/config/rc.xml:/root/.config/openbox/rc.xml:rw
       - ./ws/config/tilix.dconf:/root/tilix.dconf:rw
-      - ./ws/script/vnc.sh:/root/vnc.sh:rw
-      - ./ws/node-bridge-ros:/root/catkin_ws/src/node_bridge_ros:rw
-      - ./ws/node-bridge:/root/catkin_ws/src/node_bridge_ros/include/node_bridge/:rw
+      - ./scripts/vnc.sh:/root/vnc.sh:rw
+      - ./ws/node-bridge-ros-wrapper:/root/catkin_ws/src/node-bridge-ros-wrapper:rw
     stdin_open: true
     tty: true
     entrypoint: /root/vnc.sh
@@ -162,10 +175,8 @@ services:
       - ./ws/config/.gtkrc-2.0.mine:/root/.gtkrc-2.0.mine:rw
       - ./ws/config/rc.xml:/root/.config/openbox/rc.xml:rw
       - ./ws/config/tilix.dconf:/root/tilix.dconf:rw
-      - ./ws/node-bridge-ros:/root/catkin_ws/src/node_bridge_ros:rw
-      - ./ws/node-bridge:/root/catkin_ws/src/node_bridge_ros/include/node_bridge/:rw
-      - ./ws/script/vnc.sh:/root/vnc.sh:rw
-      - ./ws/script/slam.sh:/root/slam.sh:rw
+      - ./scripts/vnc.sh:/root/vnc.sh:rw
+      - ./scripts/slam.sh:/root/slam.sh:rw
     # entrypoint: /root/slam.sh
     entrypoint: /root/vnc.sh
 
@@ -242,9 +253,9 @@ services:
       - ./ws/config/.gtkrc-2.0.mine:/root/.gtkrc-2.0.mine:rw
       - ./ws/config/rc.xml:/root/.config/openbox/rc.xml:rw
       - ./ws/config/tilix.dconf:/root/tilix.dconf:rw
-      - ./ws/node-bridge-ros:/root/catkin_ws/src/node_bridge_ros:rw
-      - ./ws/node-bridge:/root/catkin_ws/src/node_bridge_ros/include/node_bridge/:rw
-      - ./ws/script/vnc.sh:/root/vnc.sh:rw
-      - ./ws/script/manipulator.sh:/root/manipulator.sh:rw
+      - ./scripts/vnc.sh:/root/vnc.sh:rw
+      - ./scripts/manipulator.sh:/root/manipulator.sh:rw
+      - ./ws/gold_miner_robot/:/root/catkin_ws/src/gold_miner_robot/:rw
+      - ./ws/gold_miner_moveit/:/root/catkin_ws/src/gold_miner_moveit/:rw
     # entrypoint: /root/manipulator.sh
     entrypoint: /root/vnc.sh
