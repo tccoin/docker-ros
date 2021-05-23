@@ -10,22 +10,6 @@ COPY --from=amd64 /usr/bin/qemu-aarch64-static /usr/bin/
 
 RUN sed -i 's#http://archive.ubuntu.com/ubuntu/#mirror://mirrors.ubuntu.com/mirrors.txt#' /etc/apt/sources.list;
 
-
-################################################################################
-# PROXY
-################################################################################
-
-ENV HTTP_PROXY="http://192.168.0.119:10809"  \
-    HTTPS_PROXY="http://192.168.0.119:10809" \
-    http_proxy="http://192.168.0.119:10809"  \
-    https_proxy="http://192.168.0.119:10809"
-
-RUN sudo touch /etc/apt/apt.conf.d/proxy.conf \ 
-    && sudo echo "Acquire::http::Proxy \"http://192.168.0.119:10809\";" > /etc/apt/apt.conf.d/proxy.conf \ 
-    && sudo echo "Acquire::http::Proxy \"http://192.168.0.119:10809\";" >> /etc/apt/apt.conf.d/proxy.conf \ 
-    && sudo cat /etc/apt/apt.conf.d/proxy.conf
-
-
 ################################################################################
 # VNC
 ################################################################################
@@ -77,21 +61,6 @@ RUN wget https://raw.githubusercontent.com/tccoin/docker-ubuntu-vnc-desktop/deve
 # builder
 ###################
 FROM ubuntu:focal as builder
-
-################################################################################
-# PROXY
-################################################################################
-
-ENV HTTP_PROXY="http://192.168.0.119:10809"  \
-    HTTPS_PROXY="http://192.168.0.119:10809" \
-    http_proxy="http://192.168.0.119:10809"  \
-    https_proxy="http://192.168.0.119:10809"
-
-RUN touch /etc/apt/apt.conf.d/proxy.conf \ 
-    && echo "Acquire::http::Proxy \"http://192.168.0.119:10809\";" > /etc/apt/apt.conf.d/proxy.conf \ 
-    && echo "Acquire::http::Proxy \"http://192.168.0.119:10809\";" >> /etc/apt/apt.conf.d/proxy.conf \ 
-    && cat /etc/apt/apt.conf.d/proxy.conf
-
 
 RUN sed -i 's#http://archive.ubuntu.com/ubuntu/#mirror://mirrors.ubuntu.com/mirrors.txt#' /etc/apt/sources.list;
 
