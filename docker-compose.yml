@@ -122,7 +122,7 @@ services:
       - ./ws/config/rc.xml:/root/.config/openbox/rc.xml:rw
       - ./ws/config/tilix.dconf:/root/tilix.dconf:rw
       - ./scripts/vnc.sh:/root/vnc.sh:rw
-      - ./ws/node-bridge-ros-wrapper:/root/catkin_ws/src/node-bridge-ros-wrapper:rw
+      - ./ws/node_bridge:/root/catkin_ws/src/node_bridge:rw
     stdin_open: true
     tty: true
     entrypoint: /root/vnc.sh
@@ -256,6 +256,5 @@ services:
       - ./scripts/vnc.sh:/root/vnc.sh:rw
       - ./scripts/manipulator.sh:/root/manipulator.sh:rw
       - ./ws/gold_miner_robot/:/root/catkin_ws/src/gold_miner_robot/:rw
-      - ./ws/gold_miner_moveit/:/root/catkin_ws/src/gold_miner_moveit/:rw
     # entrypoint: /root/manipulator.sh
     entrypoint: /root/vnc.sh

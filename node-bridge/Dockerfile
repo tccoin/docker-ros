@@ -4,7 +4,7 @@ WORKDIR /root/catkin_ws/
 
 RUN pip3 install munch
 
-COPY ws/node-bridge/ src/node-bridge/
+RUN git clone https://github.com/RoboVigor/RV-Node-Bridge.git src/node_bridge/
 
 RUN source /opt/ros/noetic/setup.bash \
     && catkin_make

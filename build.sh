@@ -10,3 +10,5 @@ elif [[ $architecture == "amd64" ]]; then
 fi
 
 # docker build -t tccoin/docker-ros:kinect kinect
+docker build -t tccoin/docker-ros:node-bridge node-bridge
+docker build -t tccoin/docker-ros:manipulator manipulator
