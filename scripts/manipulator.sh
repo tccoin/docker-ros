@@ -8,4 +8,4 @@ if [[ $architecture == "arm64" ]]; then
 fi
 nohup /startup.sh> vnc.log &
 export DISPLAY=:1
-source /root/ws/gm_ws/devel/setup.bash
+source /root/catkin_ws/devel/setup.bash
