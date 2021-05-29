@@ -1,0 +1,2 @@
+KERNEL=="ttyUSB*", KERNELS=="1-1.1:1.0", NAME="usbIMU1"
+KERNEL=="ttyUSB*", KERNELS=="1-1.4:1.0", NAME="usbIMU2"

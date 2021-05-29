@@ -12,3 +12,4 @@ fi
 # docker build -t tccoin/docker-ros:kinect kinect
 docker build -t tccoin/docker-ros:node-bridge node-bridge
 docker build -t tccoin/docker-ros:manipulator manipulator
+docker build -t tccoin/docker-ros:hipnuc-imu hipnuc-imu

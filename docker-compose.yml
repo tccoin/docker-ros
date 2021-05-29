@@ -96,7 +96,9 @@ services:
       - "ROS_MASTER_URI=http://ros-master:11311"
     privileged: true
     volumes:
+      - ./ws/node_bridge:/root/catkin_ws/src/node_bridge:rw
       - ./scripts/node-bridge.sh:/root/node-bridge.sh:rw
+      - /dev/serial/by-id/usb-1a86_USB2.0-Serial-if00-port0:/dev/usbTTY:ro
     entrypoint: /root/node-bridge.sh
     
   node-bridge-vnc:
@@ -258,3 +260,21 @@ services:
       - ./ws/gold_miner_robot/:/root/catkin_ws/src/gold_miner_robot/:rw
     # entrypoint: /root/manipulator.sh
     entrypoint: /root/vnc.sh
+
+  imu:
+    image: tccoin/docker-ros:hipnuc-imu
+    depends_on:
+      - ros-master
+    container_name: hipnuc_imu
+    networks:
+      - ros
+    environment:
+      - "ROS_MASTER_URI=http://ros-master:11311"
+    privileged: true
+    volumes:
+      - ./scripts/imu.sh:/root/imu.sh:rw
+      - ./ws/hipnuc_ros:/root/catkin_ws/src/hipnuc_ros:ro
+      - /dev/serial/by-id/usb-Silicon_Labs_CP2104_USB_to_UART_Bridge_Controller_02228922-if00-port0:/dev/usbIMU2:ro
+      - /dev/serial/by-id/usb-Silicon_Labs_CP2104_USB_to_UART_Bridge_Controller_02228943-if00-port0:/dev/usbIMU1:ro
+      - /dev/bus/usb:/dev/bus/usb
+    entrypoint: /root/imu.sh

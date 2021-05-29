@@ -18,3 +18,4 @@ touch ws/zsh/.zsh_history
 git clone https://github.com/RoboVigor/RV-AutoAim ws/autoaim
 git clone https://github.com/RoboVigor/RV-Node-Bridge.git ws/node_bridge
 git clone https://github.com/RoboVigor/gold-miner-robot.git ws/gold_miner_robot
+# git clone https://github.com/RoboVigor/hipnuc_ros ws/hipnuc_ros
