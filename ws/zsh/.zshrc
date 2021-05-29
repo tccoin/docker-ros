@@ -68,4 +68,5 @@ unset __conda_setup
 source ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 source /opt/ros/noetic/setup.zsh
 # source /root/build/mynt-eye-d-sdk/wrappers/ros/devel/setup.zsh
+source /root/catkin_ws/devel/setup.zsh
 export PYTHONPATH="/root/ws/autoaim/:$PYTHONPATH"
