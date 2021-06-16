@@ -258,7 +258,9 @@ services:
       - ./scripts/vnc.sh:/root/vnc.sh:rw
       - ./scripts/manipulator.sh:/root/manipulator.sh:rw
       - ./ws/gold_miner_robot/:/root/catkin_ws/src/gold_miner_robot/:rw
+      - ./ws/node_bridge:/root/catkin_ws/src/node_bridge:rw
       - /dev/serial/by-id/usb-1a86_USB2.0-Serial-if00-port0:/dev/usbTTY:ro
+      - /dev/bus/usb:/dev/bus/usb
     # entrypoint: /root/manipulator.sh
     entrypoint: /root/vnc.sh
 
@@ -275,6 +277,7 @@ services:
     volumes:
       - ./scripts/imu.sh:/root/imu.sh:rw
       - ./ws/hipnuc_ros:/root/catkin_ws/src/hipnuc_ros:ro
+      - /dev/serial/by-id/usb-Silicon_Labs_CP2104_USB_to_UART_Bridge_Controller_0222890C-if00-port0:/dev/usbIMU3:ro
       - /dev/serial/by-id/usb-Silicon_Labs_CP2104_USB_to_UART_Bridge_Controller_02228922-if00-port0:/dev/usbIMU2:ro
       - /dev/serial/by-id/usb-Silicon_Labs_CP2104_USB_to_UART_Bridge_Controller_02228943-if00-port0:/dev/usbIMU1:ro
       - /dev/bus/usb:/dev/bus/usb
