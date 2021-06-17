@@ -1,4 +1,8 @@
 # pull images
+
+architecture=$(dpkg --print-architecture)
+echo "Install requirements for ${architecture}..."
+
 if [[ $architecture == "arm64" ]]; then
     docker pull arm64v8/ros:noetic-perception
     docker tag arm64v8/ros:noetic-perception tccoin/docker-ros:ros

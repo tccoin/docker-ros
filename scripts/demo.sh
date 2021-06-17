@@ -1,3 +1,4 @@
+docker-compose run --service-ports manipulator
 tilix
 zsh
 source /root/catkin_ws/devel/setup.zsh
